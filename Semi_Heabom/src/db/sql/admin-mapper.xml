@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="selectReportListCount">
+   SELECT 
+       COUNT(*) "count"
+        FROM TB_REPORT
+</entry>
+
+<entry key="selectReportList">
+   SELECT *
+FROM (
+SELECT ROWNUM RNUM, A.*
+FROM (
+SELECT
+        REPORT_NO
+    ,   REPORTER
+    ,   REPORTED
+    ,   REPORT_CATEGORY
+    ,   REPORT_DATE
+    ,   REPORT_COMPLITE
+    ,   REPORT_STATUS
+  FROM  TB_REPORT
+  ORDER BY SUBSTR(REPORT_NO,1,1) DESC,CAST(SUBSTR(REPORT_NO,2) AS NUMBER) DESC
+  ) A
+  )
+  WHERE RNUM BETWEEN ? AND ?
+</entry>
+
+<entry key='selectReportKeyWordCount'>
+      SELECT 
+       COUNT(*) "count"
+        FROM TB_REPORT
+       WHERE REPORTED LIKE ?
+</entry>
+
+<entry key="selectReportKeyWord">
+   SELECT *
+FROM (
+SELECT ROWNUM RNUM, A.*
+FROM (
+SELECT
+        REPORT_NO
+    ,   REPORTER
+    ,   REPORTED
+    ,   REPORT_CATEGORY
+    ,   REPORT_DATE
+    ,   REPORT_COMPLITE
+    ,   REPORT_STATUS
+  FROM  TB_REPORT
+  ORDER BY SUBSTR(REPORT_NO,1,1) DESC,CAST(SUBSTR(REPORT_NO,2) AS NUMBER) DESC
+  ) A
+  WHERE REPORTED LIKE ?
+  )
+  WHERE RNUM BETWEEN ? AND ?
+</entry>
+
+<entry key="insertLogo">
+   INSERT
+   INTO TB_LOGO
+   (
+       LOGO_NO
+   ,   LOGO_STATUS
+   )
+   VALUES
+   (
+       SEQ_BNO.NEXTVAL
+   ,   'N'
+   )
+</entry>
+
+<entry key="insertLogoFileList">
+      INSERT
+   INTO TB_FILE
+   (
+       FILE_NO
+   ,   REF_NO
+   ,   ORIGIN_NAME
+   ,   CHANGE_NAME
+   ,   FILE_PATH
+   ,   FILE_LEVEL
+   )
+   VALUES
+   (
+       SEQ_FNO.NEXTVAL
+   ,   SEQ_BNO.CURRVAL
+   ,   ?
+   ,   ?
+   ,   ?
+   ,   1
+   )
+</entry>
+
+	<entry key="boardInReport">
+		INSERT INTO TB_REPORT
+		(
+		REPORT_NO
+		,REPORTER
+		,REPORTED
+		,REPORT_CATEGORY
+		,REPORT_CONTENT
+		,REPORT_DATE
+		,POST_NO
+		)
+		VALUES 
+		(
+		SEQ_RENO.NEXTVAL
+		,?
+		,?
+		,?
+		,?
+		,SYSDATE
+		,?
+		)
+	</entry>
+
+</properties>

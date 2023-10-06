@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="selectPlace">
+SELECT
+    A.*
+  , '/'|| FILE_PATH ||'/'|| CHANGE_NAME IMGPATH
+FROM(SELECT
+            PLACE_NO
+          , PLACE_TITLE
+          , MAKE_DATE
+          , PLACE_CONTENT
+          , VIEW_COUNT
+          , STAR_POINT
+          , HASHTAG_NAME
+        FROM TB_PLACE
+        LEFT JOIN TB_HASHTAG USING (PLACE_NO)
+        WHERE STATUS = 'Y'
+        AND WRITER = ?
+        ORDER BY MAKE_DATE DESC) A
+LEFT JOIN TB_FILE ON (REF_NO = A.PLACE_NO)
+WHERE FILE_LEVEL = 1
+</entry>
+
+<entry key="insertPlace">
+INSERT INTO
+    TB_PLACE(
+        PLACE_NO
+       ,PLACE_TITLE
+       ,CATEGORY_NO
+       ,WRITER
+       ,LOCATION_NO
+       ,MAKE_DATE
+       ,STATUS
+       ,PHONE
+       ,ADDRESS
+       ,PLACE_CONTENT
+       ,START_TIME
+       ,END_TIME
+       ,STAR_POINT
+       ,PLACE_URL
+       ,VIEW_COUNT
+       ,USE_TIME
+       ,USE_PRICE
+       ,BEST_STATUS
+    )
+    VALUES
+    (
+        'PL'||SEQ_PNO.NEXTVAL
+       ,? --PLACE_TITLE
+       ,? --CATEGORY_NO
+       ,? -- WRITER
+       ,? --LOCATION_NO
+       ,SYSDATE
+       ,DEFAULT
+       ,? --PHONE
+       ,? -- ADDRESS
+       ,? --PLACE_CONTENT
+       ,? --START_TIME
+       ,?  -- END_TIME
+       ,? --STAR_POINT
+       ,? --PLACE_URL
+       ,DEFAULT --VIEW_COUNT
+       ,? --USE_TIME
+       ,? --USE_PRICE
+       ,DEFAULT
+       )
+</entry>
+
+
+<entry key="insertFileList">
+INSERT 
+INTO TB_FILE
+(
+    FILE_NO
+   ,ORIGIN_NAME
+   ,CHANGE_NAME 
+   ,FILE_PATH
+   ,UPLOAD_DATE
+   ,REF_NO
+   ,STATUS
+   ,FILE_LEVEL
+)
+VALUES
+(
+    SEQ_FILE.NEXTVAL
+   ,? --ORIGIN_NAME
+   ,? --CHANGE_NAME
+   ,? --FILE_PATH
+   , SYSDATE
+   ,'PL'||SEQ_PNO.CURRVAL 
+   ,DEFAULT
+   ,? --FILE_LEVEL
+)
+</entry>
+
+<entry key="selectPlaceList">
+SELECT 
+    PLACE_NO
+   ,PLACE_TITLE
+   ,CATEGORY_NO
+   ,WRITER
+   ,LOCATION_NO
+   ,MAKE_DATE
+   ,P.STATUS
+   ,PHONE
+   ,ADDRESS
+   ,PLACE_CONTENT
+   ,START_TIME
+   ,END_TIME
+   ,STAR_POINT
+   ,PLACE_URL
+   ,VIEW_COUNT
+   ,USE_TIME
+   ,USE_PRICE
+   ,BEST_STATUS
+   ,FILE_PATH || '/' ||CHANGE_NAME "TITLEIMG"
+   ,LIKECOUNT
+FROM TB_PLACE P
+JOIN TB_FILE F ON ( REF_NO = PLACE_NO )
+WHERE LOCATION_NO = ?
+AND FILE_LEVEL = 1 
+AND P.STATUS = 'Y'
+ORDER BY LIKECOUNT DESC
+</entry>
+
+<entry key="selectMyPlace">
+SELECT 
+    PLACE_NO
+   ,PLACE_TITLE
+   ,CATEGORY_NO
+   ,WRITER
+   ,LOCATION_NO
+   ,MAKE_DATE
+   ,P.STATUS
+   ,PHONE
+   ,ADDRESS
+   ,PLACE_CONTENT
+   ,START_TIME
+   ,END_TIME
+   ,STAR_POINT
+   ,PLACE_URL
+   ,VIEW_COUNT
+   ,USE_TIME
+   ,USE_PRICE
+   ,BEST_STATUS
+   ,FILE_PATH || '/' ||CHANGE_NAME "TITLEIMG"
+   ,LIKECOUNT
+FROM TB_PLACE P
+JOIN TB_FILE F ON ( REF_NO = PLACE_NO )
+WHERE PLACE_NO = ?
+AND FILE_LEVEL = 1 
+AND P.STATUS = 'Y'
+</entry>
+
+<entry key="selectFileList">
+select 
+    FILE_NO
+   ,ORIGIN_NAME
+   ,FILE_PATH || '/' ||CHANGE_NAME "IMG"
+FROM TB_FILE
+WHERE REF_NO = ?
+AND FILE_LEVEL = 2
+</entry> 
+
+<entry key="likeUp">
+UPDATE TB_PLACE
+   SET LIKECOUNT = LIKECOUNT + 1
+WHERE PLACE_NO = ?
+</entry> 
+
+<entry key="likeCount">
+SELECT LIKECOUNT
+FROM TB_PLACE
+WHERE PLACE_NO = ?
+</entry> 
+
+<entry key="likeCheck">
+SELECT
+    MEM_NO
+   ,BOARD_NO
+FROM TB_LIKE
+WHERE MEM_NO = ?
+AND BOARD_NO = ?
+</entry> 
+
+<entry key="likeInput">
+INSERT 
+    INTO TB_LIKE(
+    MEM_NO
+   ,BOARD_NO
+   )
+   VALUES
+   (
+   ?
+  ,?
+  )
+  </entry>
+  
+<entry key="insertReview">
+INSERT
+  INTO TB_REVIEW_REPLY
+    (
+      RE_NO
+     ,RE_REF_NO
+     ,RE_WRITER
+     ,RE_CONTENT
+     ,RE_LIKE_STAR
+     ,RE_REF_STAR
+     ,RE_DATE
+     ,RE_STATUS   
+    )
+VALUES
+    (
+      'RV' || SEQ_RVRP.NEXTVAL
+    , ?
+    , ?
+    , ?
+    , 0
+    , ?
+    , SYSDATE
+    , 'Y'
+    )
+</entry>
+
+<entry key="insertReviewAttachment">
+INSERT INTO TB_FILE(
+    FILE_NO
+   ,ORIGIN_NAME
+   ,CHANGE_NAME
+   ,FILE_PATH
+   ,UPLOAD_DATE
+   ,REF_NO
+   )
+   VALUES(
+   SEQ_FILE.NEXTVAL
+   ,?
+   ,?
+   ,?
+   ,SYSDATE
+   ,'RV'|| SEQ_RVRP.CURRVAL
+)
+</entry>
+
+<entry key="selectReplyList">
+SELECT 
+ RE_NO
+,RE_WRITER
+,NICKNAME
+,RE_CONTENT
+,RE_LIKE_STAR
+,RE_REF_STAR
+,TO_CHAR(RE_DATE, 'YYYY-MM-DD HH:MI') RE_DATE
+,F.FILE_PATH || '/' || F.CHANGE_NAME IMGPATH
+,G.FILE_PATH || '/' || G.CHANGE_NAME USERIMGPATH
+FROM TB_REVIEW_REPLY
+LEFT JOIN TB_FILE F ON (REF_NO = RE_NO)
+LEFT JOIN TB_FILE G ON (RE_WRITER = G.REF_NO)
+LEFT JOIN TB_MEMBER ON (RE_WRITER = MEM_NO)
+WHERE RE_REF_NO = ?
+ORDER BY RE_DATE DESC
+</entry>
+
+
+
+<entry key="upGrade">
+UPDATE TB_MEMBER
+    SET GRADE = (
+SELECT G.GRADE
+FROM TB_GRADE G
+WHERE
+(SELECT MEM_POINT
+    FROM TB_MEMBER
+    WHERE MEM_NO = ?
+)
+BETWEEN MINPOINT AND MAXPOINT)
+WHERE MEM_NO = ?
+
+</entry>
+
+<entry key="upPoint">
+UPDATE TB_MEMBER
+    SET MEM_POINT = MEM_POINT + 150
+WHERE MEM_NO = ?
+</entry>
+
+<entry key="myFavorSelect">
+SELECT
+PLACE_NO
+,WRITER
+,PLACE_TITLE
+,LOCATION_NO
+,TO_CHAR(MAKE_DATE,'YYYY/MM/DD') MAKE_DATE
+,P.STATUS 
+,PHONE
+,ADDRESS
+,PLACE_CONTENT
+,START_TIME
+,END_TIME
+,STAR_POINT
+,PLACE_URL
+,VIEW_COUNT
+,USE_TIME
+,USE_PRICE
+,BEST_STATUS
+,LIKECOUNT
+,'/'||FILE_PATH||'/'||CHANGE_NAME TITLEIMG
+,LOCATION_NAME
+FROM TB_PLACE P
+JOIN TB_FILE ON (REF_NO = PLACE_NO)
+JOIN TB_LIKE ON (BOARD_NO = PLACE_NO)
+JOIN TB_LOCATION USING (LOCATION_NO)
+WHERE FILE_LEVEL = 1
+AND MEM_NO = ?
+</entry>
+
+</properties>

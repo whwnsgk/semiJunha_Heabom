@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<entry key='selectPlaceList'>
+SELECT 
+    PLACE_NO
+   ,PLACE_TITLE
+   ,TITLE_IMG
+   ,LIKECOUNT
+   ,ROWNUM
+FROM (SELECT 
+    PLACE_NO
+   ,PLACE_TITLE
+   ,FILE_PATH || '/' ||CHANGE_NAME AS "TITLE_IMG"
+   ,LIKECOUNT
+FROM TB_PLACE P
+JOIN TB_FILE F ON (P.PLACE_NO = F.REF_NO)
+WHERE F.FILE_LEVEL = 1
+ORDER BY LIKECOUNT DESC)
+WHERE ROWNUM BETWEEN 1 AND 3
+</entry>
+
+<entry key='selectBestPlace'>
+SELECT 
+    PLACE_NO
+   ,PLACE_TITLE
+   ,CATEGORY_NO
+   ,WRITER
+   ,LOCATION_NO
+   ,MAKE_DATE
+   ,P.STATUS
+   ,PHONE
+   ,ADDRESS
+   ,PLACE_CONTENT
+   ,START_TIME
+   ,END_TIME
+   ,STAR_POINT
+   ,PLACE_URL
+   ,VIEW_COUNT
+   ,USE_TIME
+   ,USE_PRICE
+   ,BEST_STATUS
+   ,FILE_PATH || '/' ||CHANGE_NAME "TITLEIMG"
+   ,LIKECOUNT
+FROM TB_PLACE P
+JOIN TB_FILE F ON ( REF_NO = PLACE_NO )
+WHERE FILE_LEVEL = 1 
+AND P.STATUS = 'Y'
+AND PLACE_NO = ?
+</entry>
+</properties>

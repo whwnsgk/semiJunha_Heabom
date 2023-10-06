@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<entry key="selectCourse">
+SELECT 
+    PLACE_NO
+   ,PLACE_TITLE
+   ,CATEGORY_NO
+   ,WRITER
+   ,LOCATION_NO
+   ,MAKE_DATE
+   ,P.STATUS
+   ,PHONE
+   ,ADDRESS
+   ,PLACE_CONTENT
+   ,START_TIME
+   ,END_TIME
+   ,STAR_POINT
+   ,PLACE_URL
+   ,VIEW_COUNT
+   ,USE_TIME
+   ,USE_PRICE
+   ,BEST_STATUS
+   ,FILE_PATH || '/' ||CHANGE_NAME "TITLEIMG"
+   ,LIKECOUNT
+FROM TB_PLACE P
+JOIN TB_FILE F ON ( REF_NO = PLACE_NO )
+WHERE LOCATION_NO = ?
+AND CATEGORY_NO = ?
+AND FILE_LEVEL = 1 
+AND P.STATUS = 'Y'
+ORDER BY LIKECOUNT DESC
+</entry>
+
+<entry key="selectCoursePlaceList">
+SELECT 
+    PLACE_NO
+   ,PLACE_TITLE
+   ,CATEGORY_NO
+   ,WRITER
+   ,LOCATION_NO
+   ,MAKE_DATE
+   ,P.STATUS
+   ,PHONE
+   ,ADDRESS
+   ,PLACE_CONTENT
+   ,START_TIME
+   ,END_TIME
+   ,STAR_POINT
+   ,PLACE_URL
+   ,VIEW_COUNT
+   ,USE_TIME
+   ,USE_PRICE
+   ,BEST_STATUS
+   ,FILE_PATH || '/' ||CHANGE_NAME "TITLEIMG"
+   ,LIKECOUNT
+FROM TB_PLACE P
+JOIN TB_FILE F ON ( REF_NO = PLACE_NO )
+WHERE PLACE_NO = ?
+AND FILE_LEVEL = 1 
+AND P.STATUS = 'Y'
+</entry>
+
+<entry key="saveCourse1">
+INSERT 
+INTO
+TB_COURSE
+(
+    COURSE_NO
+   ,COURSE_WRITER
+   ,PALCE1
+   ,COURSE_TIME
+   ,COURSE_MONEY
+)
+VALUES
+(
+    'C'||SEQ_CNO.NEXTVAL
+   ,? --작성자
+   ,? -- 장소번호1
+   ,? -- 시간
+   ,? -- 돈
+)
+</entry>
+
+<entry key="saveCourse2">
+INSERT 
+INTO
+TB_COURSE
+(
+    COURSE_NO
+   ,COURSE_WRITER
+   ,PALCE1
+   ,PLACE2
+   ,COURSE_TIME
+   ,COURSE_MONEY
+)
+VALUES
+(
+    'C'||SEQ_CNO.NEXTVAL
+   ,? --작성자
+   ,? -- 장소번호1
+   ,? -- 장소번호2
+   ,? -- 시간
+   ,? -- 돈
+)
+</entry>
+
+<entry key="saveCourse3">
+INSERT 
+INTO
+TB_COURSE
+(
+    COURSE_NO
+   ,COURSE_WRITER
+   ,PALCE1
+   ,PLACE2
+   ,PLACE3
+   ,COURSE_TIME
+   ,COURSE_MONEY
+)
+VALUES
+(
+    'C'||SEQ_CNO.NEXTVAL
+   ,? --작성자
+   ,? -- 장소번호1
+   ,? -- 장소번호2
+   ,? -- 장소번호3
+   ,? -- 시간
+   ,? -- 돈
+)
+</entry>
+
+<entry key="myCourseSelect">
+	SELECT
+	      PALCE1
+	    , COURSE_NO 
+	    , '/'||FILE_PATH||'/'||CHANGE_NAME TITLEIMG
+	    , LOCATION_NAME
+	FROM TB_COURSE
+	LEFT JOIN TB_PLACE ON (PLACE_NO = PALCE1)
+	JOIN TB_FILE ON (REF_NO = PALCE1)
+	JOIN TB_LOCATION USING (LOCATION_NO)
+	WHERE COURSE_WRITER = ?
+	AND FILE_LEVEL = 1
+</entry>
+
+
+<entry key="loadCourse">
+
+SELECT DISTINCT
+    PLACE_NO
+   ,PLACE_TITLE
+   ,CATEGORY_NO
+   ,WRITER
+   ,LOCATION_NO
+   ,MAKE_DATE
+   ,P.STATUS
+   ,PHONE
+   ,ADDRESS
+   ,PLACE_CONTENT
+   ,START_TIME
+   ,END_TIME
+   ,STAR_POINT
+   ,PLACE_URL
+   ,VIEW_COUNT
+   ,USE_TIME
+   ,USE_PRICE
+   ,BEST_STATUS
+   ,FILE_PATH || '/' ||CHANGE_NAME "TITLEIMG"
+   ,LIKECOUNT
+FROM TB_PLACE P
+JOIN TB_FILE F ON ( REF_NO = PLACE_NO )
+WHERE PLACE_NO IN (
+    SELECT DISTINCT PALCE1
+    FROM TB_COURSE
+    WHERE COURSE_NO = ?
+    UNION
+    SELECT DISTINCT PLACE2
+    FROM TB_COURSE
+    WHERE COURSE_NO = ?
+    UNION
+    SELECT DISTINCT PLACE3
+    FROM TB_COURSE
+    WHERE COURSE_NO = ?
+)
+AND F.FILE_LEVEL = 1
+</entry>
+
+</properties>
